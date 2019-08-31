@@ -57,7 +57,7 @@ func Title(name string) string {
 		// empty lines in multi-line headers/footers.
 		name = " "
 	}
-	return strings.ToUpper(name)
+	return name
 }
 
 // Pad String
