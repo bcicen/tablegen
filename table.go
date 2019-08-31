@@ -14,6 +14,8 @@ import (
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/bcicen/color"
 )
 
 const (
@@ -75,9 +77,9 @@ type Table struct {
 	hdrLine        bool
 	borders        Border
 	colSize        int
-	headerParams   []string
-	columnsParams  []string
-	footerParams   []string
+	headerParams   []color.Color
+	columnsParams  []color.Color
+	footerParams   []color.Color
 	columnsAlign   []int
 }
 
@@ -85,36 +87,33 @@ type Table struct {
 // Take io.Writer Directly
 func NewWriter(writer io.Writer) *Table {
 	t := &Table{
-		out:           writer,
-		rows:          [][]string{},
-		lines:         [][][]string{},
-		cs:            make(map[int]int),
-		rs:            make(map[int]int),
-		headers:       [][]string{},
-		footers:       [][]string{},
-		caption:       false,
-		captionText:   "Table caption.",
-		autoFmt:       true,
-		autoWrap:      true,
-		reflowText:    true,
-		mW:            MAX_ROW_WIDTH,
-		pCenter:       CENTER,
-		pRow:          ROW,
-		pColumn:       COLUMN,
-		tColumn:       -1,
-		tRow:          -1,
-		hAlign:        ALIGN_DEFAULT,
-		fAlign:        ALIGN_DEFAULT,
-		align:         ALIGN_DEFAULT,
-		newLine:       NEWLINE,
-		rowLine:       false,
-		hdrLine:       true,
-		borders:       Border{Left: true, Right: true, Bottom: true, Top: true},
-		colSize:       -1,
-		headerParams:  []string{},
-		columnsParams: []string{},
-		footerParams:  []string{},
-		columnsAlign:  []int{}}
+		out:          writer,
+		rows:         [][]string{},
+		lines:        [][][]string{},
+		cs:           make(map[int]int),
+		rs:           make(map[int]int),
+		headers:      [][]string{},
+		footers:      [][]string{},
+		caption:      false,
+		captionText:  "Table caption.",
+		autoFmt:      true,
+		autoWrap:     true,
+		reflowText:   true,
+		mW:           MAX_ROW_WIDTH,
+		pCenter:      CENTER,
+		pRow:         ROW,
+		pColumn:      COLUMN,
+		tColumn:      -1,
+		tRow:         -1,
+		hAlign:       ALIGN_DEFAULT,
+		fAlign:       ALIGN_DEFAULT,
+		align:        ALIGN_DEFAULT,
+		newLine:      NEWLINE,
+		rowLine:      false,
+		hdrLine:      true,
+		borders:      Border{Left: true, Right: true, Bottom: true, Top: true},
+		colSize:      -1,
+		columnsAlign: []int{}}
 	return t
 }
 
@@ -804,7 +803,7 @@ func (t *Table) printRowMergeCells(writer io.Writer, columns [][]string, rowIdx 
 	//The new previous line is the current one
 	previousLine = make([]string, total)
 	for y := 0; y < total; y++ {
-		previousLine[y] = strings.TrimRight(strings.Join(columns[y], " ")," ") //Store the full line for multi-lines cells
+		previousLine[y] = strings.TrimRight(strings.Join(columns[y], " "), " ") //Store the full line for multi-lines cells
 	}
 	//Returns the newly added line and wether or not a border should be displayed above.
 	return previousLine, displayCellBorder
