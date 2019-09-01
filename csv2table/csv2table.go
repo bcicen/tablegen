@@ -8,7 +8,7 @@ import (
 	"os"
 	"unicode/utf8"
 
-	"github.com/bcicen/tablewriter"
+	"github.com/bcicen/tablegen"
 )
 
 var (
@@ -61,7 +61,7 @@ func process(r io.Reader) {
 	}
 	csvReader.Comma = rune
 
-	table, err := tablewriter.NewCSVReader(os.Stdout, csvReader, *header)
+	table, err := tablegen.NewCSVReader(os.Stdout, csvReader, *header)
 
 	if err != nil {
 		exit(err)
@@ -69,11 +69,11 @@ func process(r io.Reader) {
 
 	switch *align {
 	case "left":
-		table.SetAlignment(tablewriter.ALIGN_LEFT)
+		table.SetAlignment(tablegen.ALIGN_LEFT)
 	case "right":
-		table.SetAlignment(tablewriter.ALIGN_RIGHT)
+		table.SetAlignment(tablegen.ALIGN_RIGHT)
 	case "center":
-		table.SetAlignment(tablewriter.ALIGN_CENTER)
+		table.SetAlignment(tablegen.ALIGN_CENTER)
 	}
 	table.SetBorder(*border)
 	table.Render()

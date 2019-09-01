@@ -6,7 +6,7 @@
 // The protocols were written in pure Go and works on windows and unix systems
 
 // Create & Generate text based table
-package tablewriter
+package tablegen
 
 import (
 	"bytes"

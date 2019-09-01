@@ -1,4 +1,4 @@
-package tablewriter
+package tablegen
 
 import (
 	"github.com/bcicen/color"
