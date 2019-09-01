@@ -83,6 +83,7 @@ type Table struct {
 	borderColor    color.Color
 	columnsAlign   []int
 	useBoxChars    bool
+	hideHeader     bool
 }
 
 // Start New Table
@@ -158,6 +159,11 @@ func (t *Table) SetHeader(keys []string) {
 		lines := t.parseDimension(v, i, headerRowIdx)
 		t.headers = append(t.headers, lines)
 	}
+}
+
+// Set table header hidden
+func (t *Table) SetHeaderHidden(b bool) {
+	t.hideHeader = b
 }
 
 // Set table Footer
@@ -435,7 +441,7 @@ func pad(align int) func(string, string, int) string {
 // Print heading information
 func (t *Table) printHeading() {
 	// Check if headers is available
-	if len(t.headers) < 1 {
+	if len(t.headers) < 1 || t.hideHeader {
 		return
 	}
 
