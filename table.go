@@ -37,6 +37,31 @@ const (
 	ALIGN_LEFT
 )
 
+const (
+	//boxCenter      = "╋"
+	//boxColumn      = "┃"
+	//boxRow         = "━"
+	//boxUpperLeft   = "┏"
+	//boxUpperRight  = "┓"
+	//boxLowerLeft   = "┗"
+	//boxLowerRight  = "┛"
+	//boxUpperCenter = "┳"
+	//boxLowerCenter = "┻"
+	//boxLeft        = "┣"
+	//boxRight       = "┫"
+	boxCenter      = "┼"
+	boxColumn      = "│"
+	boxRow         = "─"
+	boxUpperLeft   = "┌"
+	boxUpperRight  = "┐"
+	boxLowerLeft   = "└"
+	boxLowerRight  = "┘"
+	boxUpperCenter = "┬"
+	boxLowerCenter = "┴"
+	boxLeft        = "├"
+	boxRight       = "┤"
+)
+
 var (
 	decimal = regexp.MustCompile(`^-?(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d+)?$`)
 	percent = regexp.MustCompile(`^-?\d+\.?\d*$%$`)
@@ -210,9 +235,9 @@ func (t *Table) SetColMinWidth(column int, width int) {
 
 // Set table style to solid (using box drawing chars)
 func (t *Table) SetSolidStyle() {
-	t.SetCenterSeparator("┼")
-	t.SetColumnSeparator("│")
-	t.SetRowSeparator("─")
+	t.SetCenterSeparator(boxCenter)
+	t.SetColumnSeparator(boxColumn)
+	t.SetRowSeparator(boxRow)
 	t.useBoxChars = true
 }
 
@@ -361,21 +386,21 @@ func (t *Table) center(loc string, i int) string {
 func (t *Table) centerBox(loc string, i int) string {
 	switch {
 	case loc == "top" && i == -1:
-		return "┌"
+		return boxUpperLeft
 	case loc == "top" && i == len(t.cs)-1:
-		return "┐"
+		return boxUpperRight
 	case loc == "bottom" && i == -1:
-		return "└"
+		return boxLowerLeft
 	case loc == "bottom" && i == len(t.cs)-1:
-		return "┘"
+		return boxLowerRight
 	case loc == "top":
-		return "┬"
+		return boxUpperCenter
 	case loc == "bottom":
-		return "┴"
+		return boxLowerCenter
 	case i == -1:
-		return "├"
+		return boxLeft
 	case i == len(t.cs)-1:
-		return "┤"
+		return boxRight
 	}
 
 	return t.pCenter
