@@ -80,7 +80,9 @@ type Table struct {
 	headerParams   []color.Color
 	columnsParams  []color.Color
 	footerParams   []color.Color
+	borderColor    color.Color
 	columnsAlign   []int
+	useBoxChars    bool
 }
 
 // Start New Table
@@ -113,14 +115,20 @@ func NewWriter(writer io.Writer) *Table {
 		hdrLine:      true,
 		borders:      Border{Left: true, Right: true, Bottom: true, Top: true},
 		colSize:      -1,
-		columnsAlign: []int{}}
+		columnsAlign: []int{},
+		borderColor:  *color.New(),
+	}
 	return t
 }
 
 // Render table output
 func (t *Table) Render() {
+	// apply border color
+	t.pRow = t.borderColor.Sprintf(t.pRow)
+	t.pColumn = t.borderColor.Sprintf(t.pColumn)
+	t.pCenter = t.borderColor.Sprintf(t.pCenter)
 	if t.borders.Top {
-		t.printLine(true)
+		t.printLine("top", true)
 	}
 	t.printHeading()
 	if t.autoMergeCells {
@@ -128,8 +136,8 @@ func (t *Table) Render() {
 	} else {
 		t.printRows()
 	}
-	if !t.rowLine && t.borders.Bottom {
-		t.printLine(true)
+	if t.rowLine && t.borders.Bottom {
+		t.printLine("bottom", true)
 	}
 	t.printFooter()
 
@@ -192,6 +200,14 @@ func (t *Table) SetColWidth(width int) {
 // Set the minimal width for a column
 func (t *Table) SetColMinWidth(column int, width int) {
 	t.cs[column] = width
+}
+
+// Set table style to solid (using box drawing chars)
+func (t *Table) SetSolidStyle() {
+	t.SetCenterSeparator("┼")
+	t.SetColumnSeparator("│")
+	t.SetRowSeparator("─")
+	t.useBoxChars = true
 }
 
 // Set the Column Separator
@@ -319,7 +335,11 @@ func (t *Table) ClearFooter() {
 }
 
 // Center based on position and border.
-func (t *Table) center(i int) string {
+func (t *Table) center(loc string, i int) string {
+	if t.useBoxChars {
+		return t.borderColor.Sprintf(t.centerBox(loc, i))
+	}
+
 	if i == -1 && !t.borders.Left {
 		return t.pRow
 	}
@@ -331,17 +351,45 @@ func (t *Table) center(i int) string {
 	return t.pCenter
 }
 
+// Center based on position and border using box drawing chars
+func (t *Table) centerBox(loc string, i int) string {
+	switch {
+	case loc == "top" && i == -1:
+		return "┌"
+	case loc == "top" && i == len(t.cs)-1:
+		return "┐"
+	case loc == "bottom" && i == -1:
+		return "└"
+	case loc == "bottom" && i == len(t.cs)-1:
+		return "┘"
+	case loc == "top":
+		return "┬"
+	case loc == "bottom":
+		return "┴"
+	case i == -1:
+		return "├"
+	case i == len(t.cs)-1:
+		return "┤"
+	}
+
+	return t.pCenter
+}
+
 // Print line based on row width
-func (t *Table) printLine(nl bool) {
-	fmt.Fprint(t.out, t.center(-1))
+func (t *Table) printLine(loc string, nl bool) {
+	fmt.Fprint(t.out, t.center(loc, -1))
+
 	for i := 0; i < len(t.cs); i++ {
 		v := t.cs[i]
 		fmt.Fprintf(t.out, "%s%s%s%s",
 			t.pRow,
 			strings.Repeat(string(t.pRow), v),
 			t.pRow,
-			t.center(i))
+			t.center(loc, i))
 	}
+
+	//fmt.Fprint(t.out, t.center(loc, len(t.cs)-1))
+
 	if nl {
 		fmt.Fprint(t.out, t.newLine)
 	}
@@ -437,7 +485,7 @@ func (t *Table) printHeading() {
 		fmt.Fprint(t.out, t.newLine)
 	}
 	if t.hdrLine {
-		t.printLine(true)
+		t.printLine("", true)
 	}
 }
 
@@ -450,7 +498,7 @@ func (t *Table) printFooter() {
 
 	// Only print line if border is not set
 	if !t.borders.Bottom {
-		t.printLine(true)
+		t.printLine("bottom", true)
 	}
 
 	// Identify last column
@@ -695,8 +743,8 @@ func (t *Table) printRow(columns [][]string, rowIdx int) {
 		fmt.Fprint(t.out, t.newLine)
 	}
 
-	if t.rowLine {
-		t.printLine(true)
+	if t.rowLine && rowIdx != len(t.lines)-1 {
+		t.printLine("", true)
 	}
 }
 
@@ -717,7 +765,7 @@ func (t *Table) printRowsMergeCells() {
 	}
 	//Print the end of the table
 	if t.rowLine {
-		t.printLine(true)
+		t.printLine("", true)
 	}
 }
 
