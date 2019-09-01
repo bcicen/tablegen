@@ -1,4 +1,4 @@
-module github.com/bcicen/tablewriter
+module github.com/bcicen/tablegen
 
 go 1.12
 
