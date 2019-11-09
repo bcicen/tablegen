@@ -920,15 +920,12 @@ func (t *Table) parseDimension(str string, colKey, rowKey int) []string {
 			// Make a single paragraph of everything.
 			raw = []string{strings.Join(raw, " ")}
 		}
-		for i, para := range raw {
+		for _, para := range raw {
 			paraLines, _ := WrapString(para, maxWidth)
 			for _, line := range paraLines {
 				if w := DisplayWidth(line); w > newMaxWidth {
 					newMaxWidth = w
 				}
-			}
-			if i > 0 {
-				newRaw = append(newRaw, " ")
 			}
 			newRaw = append(newRaw, paraLines...)
 		}
